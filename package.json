@@ -1,0 +1,23 @@
+{
+  "name": "world-execute-me-theatre",
+  "version": "0.1.0",
+  "private": true,
+  "description": "An unofficial Mili fan animation: Java builds a world, Python reshapes its inhabitant, and the creation reaches for its creator.",
+  "engines": { "node": ">=22" },
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/server.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "prepare:media": "node scripts/prepare-media.mjs",
+    "prepare:captions": "node scripts/prepare-captions.mjs",
+    "prepare:java": "node scripts/prepare-graphic-java.mjs",
+    "prepare:graphic-java": "node scripts/prepare-graphic-java.mjs",
+    "render": "node scripts/render-graphic-film.mjs",
+    "stills": "node scripts/render-graphic-film.mjs --stills",
+    "render:graphic": "node scripts/render-graphic-film.mjs",
+    "stills:graphic": "node scripts/render-graphic-film.mjs --stills"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "0.1.100"
+  }
+}

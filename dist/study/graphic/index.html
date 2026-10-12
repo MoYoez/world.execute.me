@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>world.execute(me); · 完整演出</title>
+  <style>
+    *{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:#0d1015;color:#bfc6d5;font:12px Consolas,"Microsoft YaHei",monospace}
+    main{width:min(1440px,100%);margin:auto;padding:24px 32px}header{display:flex;align-items:center;justify-content:space-between;letter-spacing:.04em;color:#69758a;height:36px}header strong{font-weight:400;color:#bfc6d5}header span{font-size:11px}
+    canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#080a0b}canvas:fullscreen{object-fit:contain;background:#080a0b;width:100vw;height:100vh}
+    footer{display:flex;gap:22px;align-items:center;padding:22px 0;border-top:1px solid #242a35}button,a{font:inherit;color:inherit;background:none;border:0;padding:8px 0;cursor:pointer;text-decoration:none}button:hover,a:hover{color:#79a8ff}button:focus-visible,a:focus-visible{outline:1px solid #79a8ff;outline-offset:6px}#play{min-width:42px;text-align:left;color:#79a8ff}#seek{flex:1;min-width:48px;accent-color:#79a8ff;height:2px;cursor:pointer}time{font-variant-numeric:tabular-nums;color:#768298;font-size:11px;white-space:nowrap}#status{min-height:18px;color:#e1ad73}button[aria-pressed=false]{color:#626665}
+    @media(max-width:650px){main{padding:14px 16px}footer{gap:14px}header span{display:none}#fullscreen{display:none}time{font-size:10px}}
+  </style>
+</head>
+<body>
+  <main>
+    <header><strong>world.execute(me);</strong><span>Mili · 03:32</span></header>
+    <canvas id="film" width="1600" height="900" role="img" aria-label="Java 与 Python 同屏演出：图形发现光标背后的你，试探、追随并试图挽留。鼠标在画面内移动时，角色会在互动段落回应。底部显示中英歌词，最后一条调用未完成就被截断"></canvas>
+    <footer>
+      <button id="choose-audio" type="button">选择音频</button>
+      <input id="audio-file" type="file" accept="audio/*,.mp3,.m4a,.flac,.wav,.ogg" aria-label="选择本地音频" hidden>
+      <button id="play" type="button" disabled>播放</button>
+      <button id="reset" type="button" aria-label="从头重播" disabled>↺</button>
+      <input id="seek" aria-label="演出进度" type="range" min="0" max="214.906667" step=".01" value="0" disabled>
+      <time id="time">00:00 / 03:34</time>
+      <button id="captions" type="button" aria-label="中英字幕" aria-pressed="true">字幕</button>
+      <button id="fullscreen" type="button">全屏</button>
+    </footer>
+    <div id="status" role="status"></div>
+  </main>
+  <audio id="audio" preload="metadata"></audio>
+  <script type="module" src="./full/player.mjs"></script>
+</body>
+</html>

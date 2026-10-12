@@ -1,0 +1,78 @@
+import {execFileSync} from 'node:child_process';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import path from 'node:path';
+import {ROOT,DIST,EXPORTS} from './paths.mjs';
+import {SCRIPT} from '../dist/study/graphic/full/score-script.mjs';
+
+const sourceDir=path.join(ROOT,'java/graphic/goddrinksjava');
+const build=path.join(EXPORTS,'graphic-java-classes');
+await mkdir(build,{recursive:true});
+const overrides={
+  world:'world = new World(5);',create:'me = new Lovable("Me");',you:'you = new Lovable("You");',
+  run:'world.startSimulation();',
+  'amplitude-32':'me.giveDimensions(you);','circle-fit':'me.giveCircumference(you);',
+  'amplitude-39':'me.offerTangents(you);','limit-43':'me.limitBy(you);',
+  'amplitude-76':'me.giveNutrients(you);',antioxidants:'me.giveAntioxidants(you);',
+  'unlock-177':'me.learnTopic("love");','release-183':'me.takeExamTopic("love");',
+};
+const forms={SCOPE:'Lovable',POINTS:'PointSet',CIRCLE:'Circle',WAVE:'SineWave',INFINITY:'Sequence',EGGPLANT:'Eggplant',TOMATO:'Tomato',CAT:'TabbyCat',WORLD:'God'};
+const guards={'amplitude-32':'PointSet','circle-fit':'Circle','amplitude-39':'SineWave','limit-43':'Sequence','amplitude-76':'Eggplant',antioxidants:'Tomato','current-83':'TabbyCat'};
+function javaText(row){
+  if(overrides[row.id])return overrides[row.id];
+  const shape=/^me\.shape\((\w+)\);$/.exec(row.text);
+  if(shape)return `me = new ${forms[shape[1]]}(me);`;
+  return row.text.replace('me.bind(','me.setProof(').replace('me.vision(','me.canSee(')
+    .replace(/world\.era\((AD|BC)\)/,'world.timeTravel("$1")')
+    .replace('world.execute(me);','world.runExecution();').replace('world.remove(','world.runExecution(');
+}
+const rows=SCRIPT.filter(row=>row.id!=='unfinished').map(row=>({...row,java:javaText(row),at:Math.round((row.end+row.travel)*1e6)/1e6}));
+const source=[],lineMap={},ids={};
+const add=(text,id)=>{source.push(text);if(id)ids[source.length]=id;return source.length;};
+add('package goddrinksjava;');add('');
+add('import static goddrinksjava.Thing.Value.*;');add('');
+add('// An original performance in homage to Mili.');
+add('public final class GodDrinksJava {');
+add('    private World world;');add('    private Thing me, you;');add('');
+add('    public static void main(String[] args) {');
+add('        Trace.start();');
+add('        new GodDrinksJava().perform();','entry');
+add('        Trace.write();');add('    }');add('');
+add('    private void perform() {');
+const chapters=[
+  ['createOurWorld',29.5],['offerMyDimensions',44.7],['changeWithYou',58],
+  ['makeYouHappy',74],['becomeWhatYouNeed',89],['changeMyIdentity',100],
+  ['holdOnToYou',112],['searchForYou',126],['rejectTheWorld',147],
+  ['eraseEverythingElse',162],['bringYouBack',177],['learnToLove',Infinity],
+];
+for(const [name] of chapters)add(`        ${name}();`);
+add('        Trace.verifyEdits(me, you);');add('    }');add('');
+let from=-Infinity;
+for(const [name,until] of chapters){
+  add(`    private void ${name}() {`);
+  for(const row of rows.filter(r=>r.at>=from&&r.at<until)){
+    if(guards[row.id])add(`        if (me instanceof ${guards[row.id]}) {`);
+    lineMap[row.id]=add(`${guards[row.id]?'            ':'        '}${row.java}`,row.id);
+    if(guards[row.id])add('        }');
+  }
+  if(name==='learnToLove')add('','draft-slot');
+  add('    }');add('');from=until;
+}
+add('}');
+const javaSource=source.join('\n')+'\n';
+await writeFile(path.join(sourceDir,'GodDrinksJava.java'),javaSource);
+await writeFile(path.join(sourceDir,'Score.java'),`package goddrinksjava;\n\n// Generated musical timing and legacy command aliases.\nfinal class Score {\n    static final String[] IDS = {${rows.map(r=>JSON.stringify(r.id)).join(',')}};\n    static final double[] TIMES = {${rows.map(r=>r.at).join(',')}};\n    static final String[] SOURCES = {${rows.map(r=>JSON.stringify(r.text)).join(',')}};\n}\n`);
+const names=['GodDrinksJava','World','Thing','Lovable','Score','Trace'];
+const bin=name=>process.env.JAVA_HOME?path.join(process.env.JAVA_HOME,'bin',name):name;
+execFileSync(bin('javac'),['-encoding','UTF-8','-d',build,...names.map(n=>path.join(sourceDir,n+'.java'))],{windowsHide:true,stdio:'pipe'});
+const result=JSON.parse(execFileSync(bin('java'),['-cp',build,'goddrinksjava.GodDrinksJava'],{windowsHide:true,encoding:'utf8'}));
+for(const row of rows){
+  const event=result.events.find(e=>e.row===row.id);
+  if(!event||event.at!==row.at)throw new Error(`Java event mismatch: ${row.id}`);
+  result.commands[row.java]=event.command;
+}
+const digest=createHash('sha256');
+for(const name of names)digest.update(await readFile(path.join(sourceDir,name+'.java')));
+const payload={source:javaSource,lines:source.map((text,index)=>({text,id:ids[index+1]??`java-${index+1}`,line:index+1})),lineMap,commands:result.commands,events:result.events,sourceHash:digest.digest('hex'),className:'goddrinksjava.GodDrinksJava'};
+await writeFile(path.join(DIST,'study/graphic/full/java-program.mjs'),`// Generated by npm run prepare:graphic-java; compiled and executed by Java.\nexport const JAVA_PROGRAM = ${JSON.stringify(payload,null,2)};\n`);
+console.log(`Graphic Java compiled and executed: ${result.events.length} commands; ${source.length} source lines.`);
