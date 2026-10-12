@@ -16,6 +16,8 @@
 
 ## 本地观看
 
+也可以直接[在线打开演出](https://moyoez.github.io/world.execute.me/)，选择自己的音乐后播放，无需安装。文件只在浏览器本地读取。
+
 需要 Node.js 22 或更新版本。
 
 ```sh
@@ -39,6 +41,8 @@ npm start
 - META 段落由试探、跟随、挽留逐渐变成合拢身体阻止光标离开；失联后留下空握。真实鼠标只影响画面，不限制浏览器导航或退出。
 
 ## 开发与验证
+
+GitHub Pages 由 `.github/workflows/pages.yml` 发布：推送到 `main` 后，自动部署 `dist/` 中的静态文件，不包含音频和视频。
 
 ```sh
 npm test
